@@ -3,14 +3,19 @@
 
 #include <iostream>
 #include <string>
+#include "ip.h"
 
 using namespace std;
 
 class Router {
     public:
-        Router(string _listen_port);
+        Router(string _name, string _ip, string _numOfPorts);
     private:
-        string listen_port;
+        int commandFd;
+
+        string name;
+        IP ip;
+        int numOfPorts;
 };
 
 #endif

@@ -1,11 +1,10 @@
+#ifndef UTILITIES
+#define UTILITIES
 #include <iostream>
 #include <string>
 #include <string.h>
 #include <vector>
 #include <sstream>
-#ifndef UTILITIES
-#define UTILITIES
-
 #include <unistd.h>
 #include <sys/types.h>
 #include <stdio.h>

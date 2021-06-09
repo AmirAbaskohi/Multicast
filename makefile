@@ -16,6 +16,10 @@ router.out: router.o
 router.o: router.cpp router.h
 	g++ -c router.cpp -o router.o
 
+# ip
+ip.o: ip.cpp ip.h
+	g++ -c ip.cpp -o ip.o
+
 clean:
 	rm -r -f *.out
 	rm -r -f *.o

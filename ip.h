@@ -1,3 +1,6 @@
+#ifndef _IP
+#define _IP
+
 #include <string>
 #include <vector>
 #include "utilities.h"
@@ -7,6 +10,7 @@ using namespace std;
 class IP {
     public:
         IP(string ip);
+        IP();
         int compare(IP ip);
         string get_first_part();
         string get_second_part();
@@ -18,3 +22,5 @@ class IP {
         string third_part;
         string forth_part;
 };
+
+#endif

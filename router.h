@@ -1,3 +1,6 @@
+#ifndef ROUTER
+#define ROUTER
+
 #include <iostream>
 #include <string>
 
@@ -9,3 +12,5 @@ class Router {
     private:
         string listen_port;
 };
+
+#endif

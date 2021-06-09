@@ -9,6 +9,11 @@ IP::IP(string ip)
     forth_part = splitted_ip[3];
 }
 
+IP::IP()
+{
+    first_part = second_part = third_part = forth_part = "0";
+}
+
 string IP::get_first_part()
 {
     return first_part;

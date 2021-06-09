@@ -1,5 +1,9 @@
+#ifndef CLIENT
+#define CLIENT
+
 #include <iostream>
 #include <string>
+#include "ip.h"
 
 using namespace std;
 
@@ -9,8 +13,10 @@ class Client {
         void set_ip(string _ip);
     private:
         string name;
-        string server_ip;
-        string router_ip;
-        string router_port;
-        string ip;
+        IP server_ip;
+        IP router_ip;
+        IP router_port;
+        IP ip;
 };
+
+#endif

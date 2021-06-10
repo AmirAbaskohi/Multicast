@@ -22,7 +22,6 @@ void Network::makeNewClient(){
 }
 
 void Network::makeNewRouter(){
-    cout << "h2" <<endl;
     string name = commandArguments[1];
     routerIps[name] = commandArguments[2];
 
@@ -38,6 +37,19 @@ void Network::makeNewRouter(){
                         (char*)commandArguments[2].c_str(), (char*)commandArguments[3].c_str(), NULL};
         execvp(args[0], args);
     }
+}
+
+void Network::sendCommandUniCast(){
+    string srcName = commandArguments[1];
+    string destName = commandArguments[2];
+    string data = commandArguments[3];
+    if (find(clientNames, srcName) < 0 || find(clientNames, destName) < 0){
+        cout << "Error : Client Does not exist!" << endl;
+        return;
+    }
+    string fifoNameClient = "./pipes/client_" + srcName + "_cmd";
+    string message = "unicast " + clientIps[srcName] + " " + clientIps[destName] + " " + data + "\0";
+    sendMessageOnPipe(fifoNameClient, message);
 }
 
 void Network::sendNewClientConnectionMessage(){
@@ -72,11 +84,16 @@ void Network::sendNewRouterConnectionMessage(){
     }
     string fifoNameRouter1 = "./pipes/router_" + routerName1 + "_cmd";
     string fifoNameRouter2 = "./pipes/router_" + routerName2 + "_cmd";
-    string message = "connectSwitch " + routerIps[routerName1] + " " + routerIps[routerName2] 
-                    + " " + portNum1 + " " + portNum2 + "\0";
+    string message1 = "connectRouter " + routerName1 + " " +routerIps[routerName1] 
+                                      + " " + routerName2 + " " +routerIps[routerName2] 
+                                      + " " + portNum1 + " " + portNum2 + "\0";
 
-    sendMessageOnPipe(fifoNameRouter1, message);
-    sendMessageOnPipe(fifoNameRouter2, message);
+    string message2 = "connectRouter " + routerName2 + " " +routerIps[routerName2] 
+                                      + " " + routerName1 + " " +routerIps[routerName1] 
+                                      + " " + portNum2 + " " + portNum1 + "\0";
+
+    sendMessageOnPipe(fifoNameRouter1, message1);
+    sendMessageOnPipe(fifoNameRouter2, message2);
 }
 
 void Network::sendMessageOnPipe(string fifoName, string message){
@@ -100,6 +117,9 @@ int Network::detectCommand()
     }
     else if (commandArguments[0] == string(CONNECT_ROUTER_COMMAND) && commandArguments.size() == 5){
         sendNewRouterConnectionMessage();
+    }
+    else if (commandArguments[0] == string(UNICAST_COMMAND) && commandArguments.size() == 4){
+        sendCommandUniCast();
     }
     else return -1;
     return 0;    

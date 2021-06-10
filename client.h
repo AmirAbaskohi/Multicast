@@ -23,9 +23,12 @@ class Client {
         IP ip;
 
         string readOnFd(int fd);
+        void writeOnFd(string message);
         void listen();
+        void handleFrame(string frame);
         int handleCmd(string command);
         void makeConnectionToRouter(string routerName, string routerIp, string portNum);
+        void sendDataUniCast(string destIp, string message);
         
 };
 

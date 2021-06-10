@@ -13,12 +13,16 @@ Client::Client(string _name, string _ip, string _router_ip, string _router_port)
 
     cout << "client " << name << " : created" <<endl;
     commandFd = open(fifoName.c_str(), O_RDONLY);
-    cout << "heloooooooooooooooo2" <<endl;
 }
 
 void Client::set_ip(string _ip)
 {
     ip = IP(_ip);
+}
+
+void Client::writeOnFd(string message){
+    write(outFd, message.c_str(), message.size());
+    
 }
 
 string Client::readOnFd(int fd){
@@ -42,22 +46,38 @@ void Client::listen(){
         FD_SET(commandFd, &readfds);
         FD_SET(inFd, &readfds);
         maxfd = (commandFd > inFd) ? commandFd : inFd;
-        cout << "heloooooooooooooooo3" <<endl;
 
         select(maxfd + 1, &readfds, NULL, NULL, NULL);
-        cout << "heloooooooooooooooo4" <<endl;
 
         if(FD_ISSET(commandFd, &readfds)){
-            cout << "heloooooooooooooooo5" <<endl;
             message = readOnFd(commandFd);
             handleCmd(message);
         }
 
-        // if(FD_ISSET(inFd, &readfds)){
-        //     message = readOnFd(inFd);
-        //     handleFrame(message);
-        // }
+        if(FD_ISSET(inFd, &readfds)){
+            message = readOnFd(inFd);
+            handleFrame(message);
+        }
     }
+}
+
+void Client::handleFrame(string frame){
+    vector<string> frameSplit = split(frame, '#');
+    string message;
+
+    // if (frameSplit[0] == "lookFor"){
+    //     if(frameSplit[1] == to_string(systemNumber)){
+    //         message = "finded#" + to_string(systemNumber);
+    //         write(outFd, message.c_str(), message.size());
+    //     }
+    //     return;
+    // }
+}
+
+void Client::sendDataUniCast(string destIp, string message){
+    string dataframe;
+    dataframe += "dataframe#" + ip.ip + "#" + destIp + "#" + message;
+    writeOnFd(dataframe);
 }
 
 int Client::handleCmd(string command){
@@ -69,13 +89,14 @@ int Client::handleCmd(string command){
         exit(EXIT_SUCCESS);
     }
     else if (commandArg[0] == "connectClient"){
-        makeConnectionToRouter(commandArg[1], commandArg[2], commandArg[3]);
+        makeConnectionToRouter(commandArg[1], commandArg[2], commandArg[4]);
     }
-    // else if (commandArg[0] == "send"){
-    //     int dest = stoi(commandArg[2]);
-    //     string fileName = commandArg[3];
-    //     send(dest, fileName);
-    // }
+    else if (commandArg[0] == "unicast"){
+        string srcIp = commandArg[1];
+        string destIp = commandArg[2];
+        string message = commandArg[3];
+        sendDataUniCast(destIp, message);
+    }
     // else if (commandArg[0] == "receive"){
     //     int dest = stoi(commandArg[2]);
     //     string fileName = commandArg[3];
@@ -93,10 +114,10 @@ void Client::makeConnectionToRouter(string routerName, string routerIp, string p
     fifoName = "./pipes/router_" + routerName + "_" + portNum + "_in";
     outFd = open(fifoName.c_str(), O_WRONLY);
     
+    
     fifoName = "./pipes/router_" + routerName + "_" + portNum + "_out";
     inFd = open(fifoName.c_str(), O_RDONLY);
 
-    cout << routerName << " " << routerIp << " " << portNum << "###########" <<endl;
 }
 
 void Client::run(){
@@ -114,9 +135,4 @@ int main(int argc, char* argv[])
     Client* client = new Client(argv[1], argv[2], argv[3], argv[4]);
     
     client->run();
-
-    cout << argv[1] <<endl;
-    cout << argv[2] <<endl;
-    cout << argv[3] <<endl;
-    cout << argv[4] <<endl;
 }

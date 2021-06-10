@@ -1,8 +1,8 @@
 all: client.out router.out network.out
 
 # network linking
-network.out: network.o utilities.o
-	g++  network.o utilities.o -o network.out
+network.out: network.o utilities.o ip.o
+	g++  network.o utilities.o ip.o -o network.out
 
 # network
 network.o: network.cpp network.h utilities.h

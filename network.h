@@ -2,13 +2,14 @@
 #define NETWORK
 
 #include "utilities.h"
+#include "ip.h"
 
 #define MAKE_CLIENT "client"
 #define MAKE_ROUTER "router"
 #define CONNECT_CLIENT_COMMAND "connectClient"
-#define CONNECT_ROUTER_COMMAND "ConnectRouter"
+#define CONNECT_ROUTER_COMMAND "connectRouter"
+#define UNICAST_COMMAND "unicast"
 
-#define SEND_COMMAND "Send"
 #define RECEIVE_COMMAND "Receive"
 #define SPANING_COMMAND "Span"
 
@@ -33,12 +34,12 @@ class Network
         void killAllProcessses();
 
         
-        void sendCommandSend();
+        
         void sendCommandReceive();
         void sendMessageOnPipe(string fifoName, string message);
         void removeCycle();
 
-
+        void sendCommandUniCast();
         void sendNewClientConnectionMessage();
         void sendNewRouterConnectionMessage();
         void makeNewRouter();

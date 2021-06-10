@@ -1,3 +1,10 @@
-client c1 100.100.100.100 192.168.1.1 1
-router r1 192.168.1.1 2
+router r1 192.168.20.0 2
+router r2 192.168.0.0 2
+router r3 192.168.10.0 2
+client c1 192.168.20.1 192.168.1.0 1
+client c2 192.168.10.11 192.168.1.0 2
 connectClient c1 r1 1
+connectRouter r1 2 r2 1
+connectRouter r2 2 r3 1
+connectClient c2 r3 2
+unicast c1 c2 arash_rasouli

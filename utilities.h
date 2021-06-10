@@ -13,6 +13,7 @@
 #include <map>
 #include <thread>
 #include <fstream>
+#include <iterator>
 
 #define SIZE_OF_DATA_IN_FRAME 1012
 

@@ -20,8 +20,10 @@ class Router {
         vector<bool> isRouter;
         vector<string> commandArg;
 
-        vector<vector<string>> routingTable;
-        vector<vector<int>> lookUpTable;
+        // vector<vector<string>> routingTable;
+
+        map<IP, int> routingTable;
+        map<IP, vector<int>> multicastTable;
 
         string name;
         IP ip;
@@ -29,9 +31,13 @@ class Router {
 
         string readOnFd(int fd);
         void listen();
+        void handleFrame(string frame, int port);
         int handleCmd(string command);
 
         void makeNewClientConnection(string client_ip, int port);
+        void makeNewRouterConnection();
+
+        int findDestPort(IP ip);
 
 };
 

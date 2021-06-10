@@ -35,3 +35,4 @@ utilities.o: utilities.cpp utilities.h
 clean:
 	rm -r -f *.out
 	rm -r -f *.o
+	rm -r -f *.gch

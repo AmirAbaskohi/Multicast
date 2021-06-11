@@ -223,6 +223,7 @@ int Network::detectCommand()
 
 void Network::run(string testFileName)
 {
+    mkdir("pipes", 0777);
     string request;
     vector<string> requests;
 

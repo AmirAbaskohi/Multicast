@@ -93,12 +93,7 @@ void Router::handleFrame(string frame, int port){
         }
 
         else {
-            int destPort = findDestPort(dest);
-        
-            if(destPort == 0){
-                cout << "Destination port not found" <<endl;
-            }
-            write(outFds[destPort], frame.c_str(), frame.size() + 1);
+            sendUniCast(dest, frame);
         }
     }
 
@@ -106,9 +101,20 @@ void Router::handleFrame(string frame, int port){
         sendBroadcast(frame, port, false);
     }
 
+    else if (frameSplit[0] == "graft"){
+        addToMulticastTable(IP(frameSplit[2]), port);
+        sendUniCast(IP(frameSplit[1]), frame);
+    }
+
     else if (frameSplit[0] == "prune") {
-        multicastTable[IP(frameSplit[2])].push_back(port);
+        sleep(1);
+        addToMulticastTable(IP(frameSplit[2]), port);
         sendBroadcast(frame, port, true);   
+    }
+
+    else if (frameSplit[0] == "leave") {
+        removeFromMulticastTable(IP(frameSplit[2]), port);
+        sendUniCast(IP(frameSplit[1]), frame);
     }
 }
 
@@ -125,6 +131,9 @@ int Router::handleCmd(string command){
     }
     else if (commandArg[0] == "connectRouter"){
         makeNewRouterConnection();
+    }
+    else if (commandArg[0] == "showTable"){
+        showTables();
     }
     return 0;
 }
@@ -187,6 +196,18 @@ int Router::findDestPort(IP ip){
     return routingTable[max];
 }
 
+void Router::addToMulticastTable(IP groupIp, int port){
+    multicastTable[groupIp].push_back(port);
+}
+
+void Router::removeFromMulticastTable(IP groupIp, int port){
+    for (int i = 0; i < multicastTable[groupIp].size(); i++){
+        if (multicastTable[groupIp][i] == port){
+            multicastTable[groupIp].erase(multicastTable[groupIp].begin() + i);
+        }
+    }
+}
+
 void Router::sendBroadcast(string frame, int exceptPort, bool sendOnRouters){
     for (int i = 0 ; i < outFds.size() ; i++){
         if (sendOnRouters && !isRouter[i])
@@ -201,11 +222,47 @@ void Router::sendBroadcast(string frame, int exceptPort, bool sendOnRouters){
 void Router::sendMultiCast(string frame, int exceptPort) {
     vector<string> spilltedFrame = split(frame, '#');
     vector<int> ports = multicastTable[IP(spilltedFrame[2])];
+    map<int, int> isSended;
     for (int i = 0 ; i < ports.size() ; i++) {
-        if(ports[i] != exceptPort && outFds[ports[i]] > 0){
+        if(ports[i] != exceptPort && outFds[ports[i]] > 0 && isSended[ports[i]] == 0){
+            isSended[ports[i]] = 1;
             write(outFds[ports[i]], frame.c_str(), frame.size() + 1);
         }
     }
+}
+
+void Router::sendUniCast(IP dest, string frame){
+    int destPort = findDestPort(dest);
+    if(destPort == 0){
+        cout << "Destination port not found" <<endl;
+    }
+    write(outFds[destPort], frame.c_str(), frame.size() + 1);
+}
+
+void Router::showTables(){
+    map<IP, int>::iterator it1 = routingTable.begin();
+
+    cout << "---------------------routing table---------------------\n" <<endl;
+    while (it1 != routingTable.end())
+    {
+        cout << "\t IP: " << it1->first.ip << "\t Port: " << it1->second <<endl;
+        it1++;
+    }
+    cout <<"\n\n";
+
+    map<IP, vector<int>>::iterator it2 = multicastTable.begin();
+
+    cout << "---------------------multicast table---------------------\n" <<endl;
+    while (it2 != multicastTable.end())
+    {
+        cout << "\t IP multicast: " << it2->first.ip << "\t Port: ";
+        for (int i = 0; i < it2->second.size(); i++){
+            cout << it2->second[i] << " ";
+        }
+        cout << "\n";
+        it2++;
+    }
+    cout <<"\n";
 }
 
 void Router::run(){

@@ -15,8 +15,7 @@ void Network::makeNewClient(){
 
     if (fork() == 0)
     {
-        char *args[] ={ (char*)CLIENT_RUNNABLE, (char*)commandArguments[1].c_str(), (char*)commandArguments[2].c_str(),
-                        (char*)commandArguments[3].c_str(), (char*)commandArguments[4].c_str(), NULL};
+        char *args[] ={ (char*)CLIENT_RUNNABLE, (char*)commandArguments[1].c_str(), (char*)commandArguments[2].c_str(), NULL};
         execvp(args[0], args);
     }
 }
@@ -108,6 +107,8 @@ void Network::sendNewRouterConnectionMessage(){
 void Network::sendMakeGroup() {
     string clientName = commandArguments[1];
     string groupIp = commandArguments[2]; 
+    senders[groupIp] = clientName;
+    groupsIp.push_back(groupIp);
 
     if (find(clientNames, clientName) < 0){
         cout << "Error : Client Does not exist!" <<endl;
@@ -116,6 +117,61 @@ void Network::sendMakeGroup() {
     string fifoNameClient = "./pipes/client_" + clientName + "_cmd";
     string message = "createGroup " + clientName + " " + groupIp + "\0";
     sendMessageOnPipe(fifoNameClient, message);
+}
+
+void Network::sendJoinGroup() {
+    string clientName = commandArguments[1];
+    string groupIp = commandArguments[2]; 
+
+    if (find(clientNames, clientName) < 0){
+        cout << "Error : Client Does not exist!" <<endl;
+        return;
+    }
+    string fifoNameClient = "./pipes/client_" + clientName + "_cmd";
+    string message = "joinGroup " + clientIps[senders[groupIp]] + " " + groupIp + "\0";
+    sendMessageOnPipe(fifoNameClient, message);
+}
+
+void Network::sendLeaveGroup(){
+    string clientName = commandArguments[1];
+    string groupIp = commandArguments[2]; 
+
+    if (find(clientNames, clientName) < 0){
+        cout << "Error : Client Does not exist!" <<endl;
+        return;
+    }
+    string fifoNameClient = "./pipes/client_" + clientName + "_cmd";
+    string message = "leaveGroup " + clientIps[senders[groupIp]] + " " + groupIp + "\0";
+    sendMessageOnPipe(fifoNameClient, message);
+}
+
+void Network::sendGroupsIp() {
+    string clientName = commandArguments[1];
+
+    if (find(clientNames, clientName) < 0){
+        cout << "Error : Client Does not exist!" <<endl;
+        return;
+    }
+    string fifoNameClient = "./pipes/client_" + clientName + "_cmd";
+
+    string message = "groupsIp ";
+    for (int i = 0; i < groupsIp.size(); i++){
+        message += groupsIp[i] + " ";
+    }
+    sendMessageOnPipe(fifoNameClient, message);
+}
+
+void Network::sendShowTable(){
+    string routerName = commandArguments[1];
+
+    if (find(routerNames, routerName) < 0){
+        cout << "Error : Router Does not exist!" <<endl;
+        return;
+    }
+    string fifoNameRouter = "./pipes/router_" + routerName + "_cmd";
+
+    string message = "showTable";
+    sendMessageOnPipe(fifoNameRouter, message);
 }
 
 void Network::sendMessageOnPipe(string fifoName, string message){
@@ -128,7 +184,7 @@ int Network::detectCommand()
     if (commandArguments.size() == 0)
         return -1;
 
-    if (commandArguments[0] == string(MAKE_CLIENT) && commandArguments.size() == 5){
+    if (commandArguments[0] == string(MAKE_CLIENT) && commandArguments.size() == 3){
         makeNewClient();
     }
     else if (commandArguments[0] == string(MAKE_ROUTER) && commandArguments.size() == 4){
@@ -148,6 +204,18 @@ int Network::detectCommand()
     }
     else if (commandArguments[0] == string(MULTICAST_COMMAND) && commandArguments.size() == 4) {
         sendCommandMultiCast();
+    }
+    else if (commandArguments[0] == string(JOIN_GROUP_COMMAND) && commandArguments.size() == 3) {
+        sendJoinGroup();
+    }
+    else if (commandArguments[0] == string(LEAVE_GROUP_COMMAND) && commandArguments.size() == 3) {
+        sendLeaveGroup();
+    }
+    else if (commandArguments[0] == string(GET_GROUPS_COMMAND) && commandArguments.size() == 2) {
+        sendGroupsIp();
+    }
+    else if (commandArguments[0] == string(SHOW_TABLE_COMMAND) && commandArguments.size() == 2) {
+        sendShowTable();
     }
     else return -1;
     return 0;    

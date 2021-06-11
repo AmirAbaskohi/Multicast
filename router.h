@@ -38,10 +38,14 @@ class Router {
         void makeNewRouterConnection();
 
         int findDestPort(IP ip);
+        void addToMulticastTable(IP groupIp, int port);
+        void removeFromMulticastTable(IP groupIp, int port);
 
         void sendBroadcast(string frame, int exceptPort, bool sendOnRouters);
-
         void sendMultiCast(string frame, int exceptPort);
+        void sendUniCast(IP dest, string frame);
+
+        void showTables();
 
 };
 

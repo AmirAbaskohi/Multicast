@@ -1,10 +1,8 @@
 #include "client.h"
 
-Client::Client(string _name, string _ip, string _router_ip, string _router_port)
+Client::Client(string _name, string _ip)
 {
     name = _name;
-    router_ip = IP(_router_ip);
-    router_port = stoi(_router_port);
     ip = IP(_ip);
 
     string fifoName = "./pipes/client_" + name + "_cmd";
@@ -102,6 +100,12 @@ int Client::handleCmd(string command){
     else if (commandArg[0] == "createGroup") {
         sendCreateGroup(commandArg[2]);
     }
+    else if (commandArg[0] == "joinGroup") {
+        sendJoinGroup(commandArg[1], commandArg[2]);
+    }
+    else if (commandArg[0] == "leaveGroup") {
+        sendLeaveGroup(commandArg[1], commandArg[2]);
+    }
     return 0;
 }
 
@@ -120,6 +124,18 @@ void Client::makeConnectionToRouter(string routerName, string routerIp, string p
 
 }
 
+void Client::sendJoinGroup(string senderIp, string groupIp){
+    string joinGroup;
+    joinGroup += "graft#" + senderIp + "#" + groupIp;
+    writeOnFd(joinGroup);
+}
+
+void Client::sendLeaveGroup(string senderIp, string groupIp){
+    string joinGroup;
+    joinGroup += "leave#" + senderIp + "#" + groupIp;
+    writeOnFd(joinGroup);
+}
+
 void Client::sendCreateGroup(string groupIp){
     string createGroup;
     createGroup += "createGroup#" + ip.ip + "#" + groupIp;
@@ -132,13 +148,13 @@ void Client::run(){
 
 int main(int argc, char* argv[])
 {
-    if (argc != 5)
+    if (argc != 3)
     {
         cout << "Error: Invalid arg number" << endl;
         exit(EXIT_FAILURE);
     }
 
-    Client* client = new Client(argv[1], argv[2], argv[3], argv[4]);
+    Client* client = new Client(argv[1], argv[2]);
     
     client->run();
 }

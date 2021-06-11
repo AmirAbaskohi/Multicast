@@ -1,12 +1,14 @@
-router r1 192.168.20.0 2
+router r1 192.168.20.0 3
 router r2 192.168.0.0 4
-router r3 192.168.10.0 2
-client c1 192.168.20.1 192.168.1.0 1
-client c2 192.168.10.11 192.168.1.0 2
-client c3 192.168.30.85 192.168.1.0 2
-client c4 192.168.30.90 192.168.1.0 2
-client c5 192.168.10.16 192.168.1.0 2
-client c6 192.168.20.32 192.168.1.0 2
+router r3 192.168.10.0 3
+client c1 192.168.20.1
+client c2 192.168.10.11
+client c3 192.168.30.85
+client c4 192.168.30.90
+client c5 192.168.10.16
+client c6 192.168.20.32
+connectClient c5 r3 3
+connectClient c6 r1 3
 connectClient c3 r2 3
 connectClient c4 r2 4
 connectClient c1 r1 1

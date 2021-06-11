@@ -11,7 +11,7 @@ using namespace std;
 
 class Client {
     public:
-        Client(string _name, string _ip, string _router_ip, string _router_port);
+        Client(string _name, string _ip);
         void set_ip(string _ip);
         void run();
     private:
@@ -32,6 +32,8 @@ class Client {
         void makeConnectionToRouter(string routerName, string routerIp, string portNum);
         void sendData(string destIp, string message);
         void sendCreateGroup(string groupId);
+        void sendJoinGroup(string senderIp, string groupIp);
+        void sendLeaveGroup(string senderIp, string groupIp);
 };
 
 #endif

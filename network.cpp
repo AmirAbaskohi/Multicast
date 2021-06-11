@@ -52,6 +52,15 @@ void Network::sendCommandUniCast(){
     sendMessageOnPipe(fifoNameClient, message);
 }
 
+void Network::sendCommandMultiCast(){
+    string srcName = commandArguments[1];
+    string multicastIP = commandArguments[2];
+    string data = commandArguments[3];
+    string fifoNameClient = "./pipes/client_" + srcName + "_cmd";
+    string message = "multicast " + clientIps[srcName] + " " + multicastIP + " " + data + "\0";
+    sendMessageOnPipe(fifoNameClient, message);
+}
+
 void Network::sendNewClientConnectionMessage(){
     string clientName = commandArguments[1];
     string routerName = commandArguments[2];
@@ -136,6 +145,9 @@ int Network::detectCommand()
     }
     else if (commandArguments[0] == string(CREATE_GROUP_COMMAND) && commandArguments.size() == 3) {
         sendMakeGroup();
+    }
+    else if (commandArguments[0] == string(MULTICAST_COMMAND) && commandArguments.size() == 4) {
+        sendCommandMultiCast();
     }
     else return -1;
     return 0;    

@@ -30,7 +30,7 @@ class Client {
         void handleFrame(string frame);
         int handleCmd(string command);
         void makeConnectionToRouter(string routerName, string routerIp, string portNum);
-        void sendDataUniCast(string destIp, string message);
+        void sendData(string destIp, string message);
         void sendCreateGroup(string groupId);
 };
 

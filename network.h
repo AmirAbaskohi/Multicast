@@ -9,6 +9,7 @@
 #define CONNECT_CLIENT_COMMAND "connectClient"
 #define CONNECT_ROUTER_COMMAND "connectRouter"
 #define UNICAST_COMMAND "unicast"
+#define MULTICAST_COMMAND "multicast"
 #define CREATE_GROUP_COMMAND "createGroup"
 
 #define CLIENT_RUNNABLE "./client.out"
@@ -34,6 +35,7 @@ class Network
         void sendMakeGroup();
         void sendMessageOnPipe(string fifoName, string message);
         void sendCommandUniCast();
+        void sendCommandMultiCast();
         void sendNewClientConnectionMessage();
         void sendNewRouterConnectionMessage();
         void makeNewRouter();

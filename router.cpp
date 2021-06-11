@@ -84,28 +84,31 @@ void Router::handleFrame(string frame, int port){
     vector<string> frameSplit = split(frame, '#');
     string message;
 
-    // if (frameSplit[0] == "lookFor"){
-    //     if(frameSplit[1] == to_string(systemNumber)){
-    //         message = "finded#" + to_string(systemNumber);
-    //         write(outFd, message.c_str(), message.size());
-    //     }
-    //     return;
-    // }
-
     if (frameSplit[0] == "dataframe"){
         IP src = IP(frameSplit[1]);
         IP dest = IP(frameSplit[2]);
 
-        int destPort = findDestPort(dest);
-        
-        if(destPort == 0){
-            cout << "Destination port not found" <<endl;
+        if (dest.get_first_part() == "200") {
+            sendMultiCast(frame, port);
         }
-        write(outFds[destPort], frame.c_str(), frame.size() + 1);
+
+        else {
+            int destPort = findDestPort(dest);
+        
+            if(destPort == 0){
+                cout << "Destination port not found" <<endl;
+            }
+            write(outFds[destPort], frame.c_str(), frame.size() + 1);
+        }
     }
 
     else if (frameSplit[0] == "createGroup"){
         sendBroadcast(frame, port, false);
+    }
+
+    else if (frameSplit[0] == "prune") {
+        multicastTable[IP(frameSplit[2])].push_back(port);
+        sendBroadcast(frame, port, true);   
     }
 }
 
@@ -185,7 +188,7 @@ int Router::findDestPort(IP ip){
 }
 
 void Router::sendBroadcast(string frame, int exceptPort, bool sendOnRouters){
-    for ( int i = 0 ; i < outFds.size() ; i++){
+    for (int i = 0 ; i < outFds.size() ; i++){
         if (sendOnRouters && !isRouter[i])
             continue;
         if(i != exceptPort && outFds[i] > 0){
@@ -193,6 +196,16 @@ void Router::sendBroadcast(string frame, int exceptPort, bool sendOnRouters){
         }
     }
 
+}
+
+void Router::sendMultiCast(string frame, int exceptPort) {
+    vector<string> spilltedFrame = split(frame, '#');
+    vector<int> ports = multicastTable[IP(spilltedFrame[2])];
+    for (int i = 0 ; i < ports.size() ; i++) {
+        if(ports[i] != exceptPort && outFds[ports[i]] > 0){
+            write(outFds[ports[i]], frame.c_str(), frame.size() + 1);
+        }
+    }
 }
 
 void Router::run(){

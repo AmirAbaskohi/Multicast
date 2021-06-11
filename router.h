@@ -41,6 +41,8 @@ class Router {
 
         void sendBroadcast(string frame, int exceptPort, bool sendOnRouters);
 
+        void sendMultiCast(string frame, int exceptPort);
+
 };
 
 #endif

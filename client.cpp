@@ -67,7 +67,7 @@ void Client::handleFrame(string frame){
     if (frameSplit[0] == "createGroup") {
         srand(time(0) + name[1]);
         bool accept = rand() % 2;
-        if (accept)
+        if (name[1] == '2' || name[1] == '4')
         {
             cout << "Client with name " + name + " joined the group " + frameSplit[2] << endl;
             string message = "prune#" + ip.ip + "#" + frameSplit[2];
@@ -76,7 +76,7 @@ void Client::handleFrame(string frame){
     }
 }
 
-void Client::sendDataUniCast(string destIp, string message){
+void Client::sendData(string destIp, string message){
     string dataframe;
     dataframe += "dataframe#" + ip.ip + "#" + destIp + "#" + message;
     writeOnFd(dataframe);
@@ -93,11 +93,11 @@ int Client::handleCmd(string command){
     else if (commandArg[0] == "connectClient"){
         makeConnectionToRouter(commandArg[1], commandArg[2], commandArg[4]);
     }
-    else if (commandArg[0] == "unicast"){
+    else if (commandArg[0] == "unicast" || commandArg[0] == "multicast"){
         string srcIp = commandArg[1];
         string destIp = commandArg[2];
         string message = commandArg[3];
-        sendDataUniCast(destIp, message);
+        sendData(destIp, message);
     }
     else if (commandArg[0] == "createGroup") {
         sendCreateGroup(commandArg[2]);

@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 #include "ip.h"
 
 using namespace std;
@@ -29,7 +31,7 @@ class Client {
         int handleCmd(string command);
         void makeConnectionToRouter(string routerName, string routerIp, string portNum);
         void sendDataUniCast(string destIp, string message);
-        
+        void sendCreateGroup(string groupId);
 };
 
 #endif

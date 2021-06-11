@@ -39,6 +39,8 @@ class Router {
 
         int findDestPort(IP ip);
 
+        void sendBroadcast(string frame, int exceptPort, bool sendOnRouters);
+
 };
 
 #endif

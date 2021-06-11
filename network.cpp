@@ -96,6 +96,19 @@ void Network::sendNewRouterConnectionMessage(){
     sendMessageOnPipe(fifoNameRouter2, message2);
 }
 
+void Network::sendMakeGroup() {
+    string clientName = commandArguments[1];
+    string groupIp = commandArguments[2]; 
+
+    if (find(clientNames, clientName) < 0){
+        cout << "Error : Client Does not exist!" <<endl;
+        return;
+    }
+    string fifoNameClient = "./pipes/client_" + clientName + "_cmd";
+    string message = "createGroup " + clientName + " " + groupIp + "\0";
+    sendMessageOnPipe(fifoNameClient, message);
+}
+
 void Network::sendMessageOnPipe(string fifoName, string message){
     int fd = open(fifoName.c_str(), O_WRONLY);
     write(fd, message.c_str(), message.size() + 1);
@@ -120,6 +133,9 @@ int Network::detectCommand()
     }
     else if (commandArguments[0] == string(UNICAST_COMMAND) && commandArguments.size() == 4){
         sendCommandUniCast();
+    }
+    else if (commandArguments[0] == string(CREATE_GROUP_COMMAND) && commandArguments.size() == 3) {
+        sendMakeGroup();
     }
     else return -1;
     return 0;    

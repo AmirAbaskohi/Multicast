@@ -22,7 +22,6 @@ void Client::set_ip(string _ip)
 
 void Client::writeOnFd(string message){
     write(outFd, message.c_str(), message.size());
-    
 }
 
 string Client::readOnFd(int fd){
@@ -65,13 +64,16 @@ void Client::handleFrame(string frame){
     vector<string> frameSplit = split(frame, '#');
     string message;
 
-    // if (frameSplit[0] == "lookFor"){
-    //     if(frameSplit[1] == to_string(systemNumber)){
-    //         message = "finded#" + to_string(systemNumber);
-    //         write(outFd, message.c_str(), message.size());
-    //     }
-    //     return;
-    // }
+    if (frameSplit[0] == "createGroup") {
+        srand(time(0) + name[1]);
+        bool accept = rand() % 2;
+        if (accept)
+        {
+            cout << "Client with name " + name + " joined the group " + frameSplit[2] << endl;
+            string message = "prune#" + ip.ip + "#" + frameSplit[2];
+            writeOnFd(message);
+        }
+    }
 }
 
 void Client::sendDataUniCast(string destIp, string message){
@@ -97,11 +99,9 @@ int Client::handleCmd(string command){
         string message = commandArg[3];
         sendDataUniCast(destIp, message);
     }
-    // else if (commandArg[0] == "receive"){
-    //     int dest = stoi(commandArg[2]);
-    //     string fileName = commandArg[3];
-    //     receive(dest, fileName);
-    // }
+    else if (commandArg[0] == "createGroup") {
+        sendCreateGroup(commandArg[2]);
+    }
     return 0;
 }
 
@@ -118,6 +118,12 @@ void Client::makeConnectionToRouter(string routerName, string routerIp, string p
     fifoName = "./pipes/router_" + routerName + "_" + portNum + "_out";
     inFd = open(fifoName.c_str(), O_RDONLY);
 
+}
+
+void Client::sendCreateGroup(string groupIp){
+    string createGroup;
+    createGroup += "createGroup#" + ip.ip + "#" + groupIp;
+    writeOnFd(createGroup);
 }
 
 void Client::run(){

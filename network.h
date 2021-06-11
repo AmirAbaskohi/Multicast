@@ -9,9 +9,7 @@
 #define CONNECT_CLIENT_COMMAND "connectClient"
 #define CONNECT_ROUTER_COMMAND "connectRouter"
 #define UNICAST_COMMAND "unicast"
-
-#define RECEIVE_COMMAND "Receive"
-#define SPANING_COMMAND "Span"
+#define CREATE_GROUP_COMMAND "createGroup"
 
 #define CLIENT_RUNNABLE "./client.out"
 #define ROUTER_RUNNABLE "./router.out"
@@ -33,12 +31,8 @@ class Network
         int detectCommand();
         void killAllProcessses();
 
-        
-        
-        void sendCommandReceive();
+        void sendMakeGroup();
         void sendMessageOnPipe(string fifoName, string message);
-        void removeCycle();
-
         void sendCommandUniCast();
         void sendNewClientConnectionMessage();
         void sendNewRouterConnectionMessage();

@@ -103,6 +103,10 @@ void Router::handleFrame(string frame, int port){
         }
         write(outFds[destPort], frame.c_str(), frame.size() + 1);
     }
+
+    else if (frameSplit[0] == "createGroup"){
+        sendBroadcast(frame, port, false);
+    }
 }
 
 int Router::handleCmd(string command){
@@ -178,6 +182,17 @@ int Router::findDestPort(IP ip){
         it++;
     }
     return routingTable[max];
+}
+
+void Router::sendBroadcast(string frame, int exceptPort, bool sendOnRouters){
+    for ( int i = 0 ; i < outFds.size() ; i++){
+        if (sendOnRouters && !isRouter[i])
+            continue;
+        if(i != exceptPort && outFds[i] > 0){
+            write(outFds[i], frame.c_str(), frame.size() + 1);
+        }
+    }
+
 }
 
 void Router::run(){

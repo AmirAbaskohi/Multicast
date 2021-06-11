@@ -67,7 +67,7 @@ void Client::handleFrame(string frame){
     if (frameSplit[0] == "createGroup") {
         srand(time(0) + name[1]);
         bool accept = rand() % 2;
-        if (name[1] == '2' || name[1] == '4')
+        if (accept)
         {
             cout << "Client with name " + name + " joined the group " + frameSplit[2] << endl;
             string message = "prune#" + ip.ip + "#" + frameSplit[2];
